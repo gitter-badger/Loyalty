@@ -1,0 +1,22 @@
+video, img{
+    transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+}
+
+.plasters{
+    position:relative;
+    top: 5px;
+    left: 6px;
+}
+.ready{
+    position:absolute;
+    top: 25px;
+    left: 1050px;
+}
+.plaster{
+    position:absolute;
+
+}

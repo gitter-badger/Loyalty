@@ -1,0 +1,10 @@
+{% if is_login %}
+    {% include '_templates/tinymce.twig' %}
+{% endif %}
+
+{% for key, content in result %}
+    <div class="block" positionId="{{ loop.index }}">
+        {{ content.text|raw }}
+    </div>
+{% endfor %}
+

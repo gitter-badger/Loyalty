@@ -1,0 +1,91 @@
+<table class="table">
+    <colgroup>
+        <col width="150" />
+        <col width="150" />
+        <col width="200" />
+        <col width="150" />
+        <col width="150" />
+        <col width="200" />
+        <col width="300" />
+    </colgroup>
+    <tbody>
+    <tr style="background: #EEEEEE">
+        <th><strong>Дата</strong></th>
+        <th><strong>Тема</strong></th>
+        <th><strong>Текст</strong></th>
+    </tr>
+    {% for key, news in result %}
+        <tr>
+            <td>
+                {{ news.date|date('d-m-Y H:i:s') }}
+            </td>
+            <td>
+                {{ news.title }}
+            </td>
+            <td>
+                {{ news.text|raw }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if is_login %}
+
+    <script>
+        tinymce.init({
+            selector:'textarea#text',
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image",
+            plugins: [
+                "advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks code fullscreen",
+                "insertdatetime media table contextmenu paste"
+            ],
+            theme: "modern"
+        });
+    </script>
+
+    <form action="#"  method="POST" class="form-horizontal">
+        <fieldset>
+
+            <!-- Form Name -->
+            <legend>Добавить новость</legend>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="title">Title</label>
+                <div class="col-md-8">
+                    <input id="title" name="title" placeholder="" class="form-control input-md" required="" type="text">
+                    <span class="help-block">Заголовок новости</span>
+                </div>
+            </div>
+
+            <!-- Textarea -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="announce">Announce</label>
+                <div class="col-md-8">
+                    <textarea class="form-control" id="announce" name="announce"></textarea>
+                    <span class="help-block">Анонс новости</span>
+                </div>
+            </div>
+
+            <!-- Textarea -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="text">Text</label>
+                <div class="col-md-8">
+                    <textarea class="form-control" id="text" name="text"></textarea>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="submit_add_news"></label>
+                <div class="col-md-4">
+                    <button id="submit_add_news" name="submit_add_news" class="btn btn-default">Добавить</button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+{% endif %}
