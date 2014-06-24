@@ -1,34 +1,27 @@
-<table class="table">
-    <colgroup>
-        <col width="150" />
-        <col width="150" />
-        <col width="200" />
-        <col width="150" />
-        <col width="150" />
-        <col width="200" />
-        <col width="300" />
-    </colgroup>
-    <tbody>
-    <tr style="background: #EEEEEE">
-        <th><strong>Дата</strong></th>
-        <th><strong>Тема</strong></th>
-        <th><strong>Текст</strong></th>
-    </tr>
-    {% for key, news in result %}
-        <tr>
-            <td>
-                {{ news.date|date('d-m-Y H:i:s') }}
-            </td>
-            <td>
-                {{ news.title }}
-            </td>
-            <td>
-                {{ news.text|raw }}
-            </td>
-        </tr>
+{% if count is defined %}
+    {% for key, value in news %}
+        <blockquote>
+            <h2>
+                {% if value.text is not null %}
+                    <a href="{{ _page.segment }}/{{ value.id }}">{{ value.title }}</a>
+                {% else %}
+                    {{ value.title }}
+                {% endif %}
+            </h2>
+            {{ value.announce|raw }}
+            <footer>
+                {{ value.date|date('d-m-Y H:i:s') }}
+            </footer>
+        </blockquote>
     {% endfor %}
-    </tbody>
-</table>
+{% else %}
+    <h2>{{ news.title }}</h2>
+    <small>{{ news.date|date('d-m-Y H:i:s') }}</small>
+    <hr/>
+    {{ news.text|raw }}
+{% endif %}
+
+
 
 {% if is_login %}
 

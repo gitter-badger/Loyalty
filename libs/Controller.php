@@ -46,17 +46,12 @@ class Controller
         // @see http://twig.sensiolabs.org
         $twig_loader = new Twig_Loader_Filesystem(PATH_VIEWS);
         $twig = new Twig_Environment($twig_loader);
-
         $page = Registry::get('pageArray');
         $siteArray = Registry::get('siteArray');
-
-        $twig->addGlobal('page_title', $page['title']);
+        $twig->addGlobal('_page', $page);
         $twig->addGlobal('view', $page['view'] . PATH_VIEW_FILE_TYPE);
-        $twig->addGlobal('site_map', $siteArray);
-        $twig->addGlobal('is_login', $this->auth->is_login);
-        $twig->addGlobal('username', $this->auth->is_login?$this->auth->userName:'Guest');
-        $twig->addGlobal('groupname', $this->auth->is_login?$this->auth->groupName:false);
-        $twig->addGlobal('right', $this->auth->is_login?$this->auth->right:false);
+        $twig->addGlobal('_siteMap', $siteArray);
+        $twig->addGlobal('_user', $this->auth);
 
         // render a view while passing the to-be-rendered data
         echo $twig->render('_templates/' . $page['layout'] . PATH_VIEW_FILE_TYPE, $data_array);

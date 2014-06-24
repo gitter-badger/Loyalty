@@ -1,7 +1,7 @@
-{% if is_login %}
+{% if _user.isLogin %}
 
-    Hello, {{ username }}<br/>
-    You group {{ groupname }} <br/>
+    Hello, {{ _user.userName }}<br/>
+    You group {{ _user.groupName }} <br/>
     <form action="#"  method="POST" class="form-horizontal">
         <fieldset>
             <!-- Button -->

@@ -15,15 +15,44 @@
 
 
 class News extends Controller {
-    function index(){
-        // load model, perform an action on the model
+    function index($params){
         $news_model = $this->loadModel('News');
-        // if we have POST data to create a news
+
+        switch (count($params)){
+            case 1:
+                $this->render([
+                    'news' => $news_model->getNews($params[0]),
+                ]);
+                break;
+
+            case 2:
+                $news = $news_model->getLast($params[0], $params[1]);
+                $this->render([
+                    'count' => count($news),
+                    'news' => $news,
+                ]);
+                break;
+
+            default:
+                $news = $news_model->getLast();
+                $this->render([
+                    'count' => count($news),
+                    'news' => $news,
+                ]);
+                break;
+
+        }
+
+
+
+    }
+    function add(){
+
+
+        $news_model = $this->loadModel('News');
+
         if (isset($_POST["submit_add_news"]) && $this->auth->is_login) {
             $news_model->addNews($_POST["title"], $_POST["text"]);
         }
-        $this->render([
-            'result' => $news_model->getLast(),
-        ]);
     }
 }

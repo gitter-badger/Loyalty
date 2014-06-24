@@ -17,11 +17,10 @@
 class NewsModel extends Model
 {
 
-    function getLast($count = 10){
+    function getLast($from = 0, $count = 10){
 
-        $query = $this->db->prepare('SELECT * FROM news ORDER BY date DESC LIMIT ?');
-        $query->bindParam(1, $count);
-        $query->execute();
+        $query = $this->db->prepare('SELECT id, title, announce, text, date FROM news WHERE smapId = ? ORDER BY date DESC LIMIT ?, ?');
+        $query->execute([Registry::get('pageArray')['id'], $from, $count]);
 
         return $query->fetchAll();
 
@@ -29,8 +28,8 @@ class NewsModel extends Model
 
     function getNews($id){
 
-        $query = $this->db->prepare('SELECT * FROM news WHERE id = ?');
-        $query->execute([$id]);
+        $query = $this->db->prepare('SELECT title, announce, text, date FROM news WHERE id = ? AND smapId = ?');
+        $query->execute([$id, Registry::get('pageArray')['id']]);
         return $query->fetch();
 
     }
@@ -38,9 +37,8 @@ class NewsModel extends Model
     function addNews($title, $text, $date = FALSE){
 
         if(!$date) $date = time();
-        $query = $this->db->prepare('INSERT INTO news (title, text, date) VALUES (?, ?, ?)');
-        $query->execute([$title, $text, $date]);
+        $query = $this->db->prepare('INSERT INTO news (smapId, title, announce, text, date) VALUES (?, ?, ?, ?)');
+        $query->execute([Registry::get('pageArray')['id'], $title, $text, $date]);
 
-        //echo "<pre>"; print_r($lastNews);echo "</pre>";
     }
 }

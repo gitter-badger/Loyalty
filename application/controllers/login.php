@@ -17,10 +17,6 @@
 class Login extends Controller {
     function index(){
 
-/*
-        $this->auth->login('test@example.com','test')){
-*/
-
         // Login user
         if (isset($_POST["login"])) {
             $this->auth->login($_POST['email'], $_POST['password']);
@@ -31,9 +27,7 @@ class Login extends Controller {
             $this->auth->logout();
         }
 
-        $this->render([
-            'username' => $this->auth->userName,
-        ]);
+        $this->render();
     }
 
 }

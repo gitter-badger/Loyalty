@@ -15,11 +15,19 @@
 
 class Auth
 {
-    public $userName = 'Guest';
-    public $is_login = false;
-    public $groupName;
-    public $right = false;
-    private $db, $userId, $groupId;
+    public
+        $userName = 'Guest',
+        $isLogin = false,
+        $groupName,
+        $right = false,
+        $read,
+        $add,
+        $edit,
+        $delete;
+    private
+        $db,
+        $userId,
+        $groupId;
 
     function __construct($db) {
         try {
@@ -89,7 +97,7 @@ class Auth
                 if ($this->checkbrute($this->userId) == true) {
                     // Account is locked
                     // Send an email to user saying their account is locked
-                    $this->is_login = false;
+                    $this->isLogin = false;
                 } else {
                     // Check if the password in the database matches
                     // the password the user submitted.
@@ -105,22 +113,22 @@ class Auth
                         $_SESSION['username'] = $this->userName;
                         $_SESSION['login_string'] = hash('sha512',$password.$user_browser);
                         // Login successful.
-                        $this->is_login = true;
+                        $this->isLogin = true;
                     } else {
                         // Password is not correct
                         // We record this attempt in the database
                         $now = time();
                         $this->db->exec("INSERT INTO authLogins(userId, time) VALUES ('$this->userId', '$now')");
-                        $this->is_login = false;
+                        $this->isLogin = false;
                     }
                 }
             } else {
                 // No user exists.
-                $this->is_login = false;
+                $this->isLogin = false;
             }
         }
 
-        return $this->is_login;
+        return $this->isLogin;
     }
 
     public function logout() {
@@ -142,7 +150,7 @@ class Auth
         session_destroy();
 
         $this->userName = 'Guest';
-        $this->is_login = false;
+        $this->isLogin = false;
     }
 
     private function checkbrute() {
@@ -159,18 +167,18 @@ class Auth
 
             // If there have been more than 5 failed logins
             if ($query->fetch()[0] > 5) {
-                $this->is_login = true;
+                $this->isLogin = true;
             } else {
-                $this->is_login = false;
+                $this->isLogin = false;
             }
         }
 
-        return $this->is_login;
+        return $this->isLogin;
     }
 
     private function login_check() {
         $db_password = '';
-        $this->is_login = false;
+        $this->isLogin = false;
 
         // Check if all session variables are set
         if (isset($_SESSION['user_id'],
@@ -202,13 +210,13 @@ class Auth
                     $login_check = hash('sha512', $password.$user_browser);
                     if ($login_check == $login_string) {
                         // Logged In!!!!
-                        $this->is_login = true;
+                        $this->isLogin = true;
 
                     }
                 }
             }
         }
-        return $this->is_login;
+        return $this->isLogin;
     }
 
     public function access_check($smapId){
@@ -223,6 +231,39 @@ class Auth
             $query->bindColumn('right', $this->right);
             $query->fetch();
         }
+        switch ($this->right){
+            case 0:
+                $this->read = false;
+                $this->add = false;
+                $this->edit = false;
+                $this->delete = false;
+                break;
+            case 1:
+                $this->read = true;
+                $this->add = false;
+                $this->edit = false;
+                $this->delete = false;
+                break;
+            case 2:
+                $this->read = true;
+                $this->add = true;
+                $this->edit = false;
+                $this->delete = false;
+                break;
+            case 3:
+                $this->read = true;
+                $this->add = true;
+                $this->edit = true;
+                $this->delete = false;
+                break;
+            case 4:
+                $this->read = true;
+                $this->add = true;
+                $this->edit = true;
+                $this->delete = true;
+                break;
+        }
+
         return $this->right;
     }
     private function esc_url($url) {
