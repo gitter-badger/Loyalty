@@ -21,3 +21,7 @@ In Twig templates you must use:
 * {{ _page.id }} (int)
 * {{ _page.segment }} (text)
 
+In PHP:
+
+Comming soon...
+
