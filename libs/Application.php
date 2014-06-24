@@ -25,7 +25,14 @@ class Application
      */
     public function __construct()
     {
-        $this->db = Registry::get('db');
+        // create database connection
+        try {
+            $this->db = new Database();
+        } catch (PDOException $e) {
+            die('Database connection could not be established.');
+        }
+
+        Registry::set('db', $this->db);
 
         //Main page
         $query = $this->db->prepare('SELECT * FROM siteMap WHERE pid = 0');
@@ -86,10 +93,9 @@ class Application
         $query = $this->db->prepare('SELECT * FROM siteMap');
         $query->execute();
         $result = $query->fetchAll();
-        //Перелапачиваем массим (делаем из одномерного массива - двумерный, в котором
-        //первый ключ - parent_id)
+        //Перелапачиваем массим (делаем из одномерного массива - двумерный, в котором первый ключ - parent_id)
         $return = array();
-        foreach ($result as $value) { //Обходим массив
+        foreach ($result as $value) {
             $return[$value['pid']][] = $value;
         }
         return $return;

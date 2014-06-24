@@ -32,7 +32,7 @@ class Login extends Controller {
         }
 
         $this->render([
-            'username' => $this->auth->username,
+            'username' => $this->auth->userName,
         ]);
     }
 

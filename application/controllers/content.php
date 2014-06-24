@@ -22,8 +22,10 @@ class Content extends Controller {
 
         if (isset($_POST['save']) && $this->auth->is_login) {
             $content->editContent($_POST['position'], $_POST['text']);
+            echo 'Ok';
         } else {
-        $result = $content->getContent();
+            $editable = $this->auth->right != NULL?true:false;
+            $result = $content->getContent();
             if(!$result){
                 $result = [0 => ['text' => 'No content', 'position' => 1]];
             }

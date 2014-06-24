@@ -54,9 +54,9 @@ class Controller
         $twig->addGlobal('view', $page['view'] . PATH_VIEW_FILE_TYPE);
         $twig->addGlobal('site_map', $siteArray);
         $twig->addGlobal('is_login', $this->auth->is_login);
-        $twig->addGlobal('username', $this->auth->is_login?$this->auth->username:'Guest');
-
-
+        $twig->addGlobal('username', $this->auth->is_login?$this->auth->userName:'Guest');
+        $twig->addGlobal('groupname', $this->auth->is_login?$this->auth->groupName:false);
+        $twig->addGlobal('right', $this->auth->is_login?$this->auth->right:false);
 
         // render a view while passing the to-be-rendered data
         echo $twig->render('_templates/' . $page['layout'] . PATH_VIEW_FILE_TYPE, $data_array);

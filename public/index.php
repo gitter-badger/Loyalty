@@ -25,13 +25,5 @@ require '../application/config/config.php';
 // The auto-loader to load the php-login related internal stuff automatically
 require '../libs/_autoload.php';
 
-// create database connection
-try {
-    $db = new Database();
-} catch (PDOException $e) {
-    die('Database connection could not be established.');
-}
-Registry::set('db', $db);
-
 // start the application
 $app = new Application();

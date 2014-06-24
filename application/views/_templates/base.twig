@@ -12,6 +12,8 @@
 
     <link rel="stylesheet" href="/bootstrap/3.1.1/css/bootstrap.min.css">
     <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/loyalty.css" rel="stylesheet">
+
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     {% if is_login %}
         <script src="/js/tinymce/tinymce.min.js"></script>
@@ -22,6 +24,7 @@
 <body>
 
 <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    <div class="container-fluid mce"></div>
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="{{ constant('URL') }}">Loyality programs</a>
@@ -29,7 +32,7 @@
 
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
-                {% if is_login %}
+                {% if right == 2 %}
                     <li>
                         <a onclick="edit()">Edit</a>
                     </li>
@@ -43,7 +46,6 @@
                 </li>
             </ul>
         </div>
-
     </div>
 </div>
 

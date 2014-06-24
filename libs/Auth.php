@@ -15,10 +15,11 @@
 
 class Auth
 {
-
-    public $username = 'Guest';
-    public $is_login;
-    private $db;
+    public $userName = 'Guest';
+    public $is_login = false;
+    public $groupName;
+    public $right = false;
+    private $db, $userId, $groupId;
 
     function __construct($db) {
         try {
@@ -29,8 +30,10 @@ class Auth
 
         $this->sec_session_start();
 
-        if($this->is_login = $this->login_check())
-            $this->username = $_SESSION['username'];
+        if($this->login_check()){
+            $this->access_check(Registry::get('pageArray')['id']);
+        }
+
     }
 
     private function sec_session_start() {
@@ -40,7 +43,7 @@ class Auth
         $httponly = true;
         // Forces sessions to only use cookies.
         if (ini_set('session.use_only_cookies', 1) === false) {
-            header("Location: ../error.php?err=Could not initiate a safe session (ini_set)");
+            header("Location: ../error/403");
             exit();
         }
         // Gets current cookies params.
@@ -57,21 +60,25 @@ class Auth
     }
 
     public function login($email, $password) {
+        $user_id = '';
+        $username = '';
+        $db_password = '';
+        $salt = '';
         // Using prepared statements means that SQL injection is not possible.
-        if ($stmt = $this->db->prepare(
+        if ($query = $this->db->prepare(
             "SELECT id, username, password, salt
-              FROM members
+              FROM authUsers
               WHERE email = ?
               LIMIT 1")
         ) {
-            $result = $stmt->execute([$email]);    // Execute the prepared query.
+            $result = $query->execute([$email]);    // Execute the prepared query.
 
             // get variables from result.
-            $stmt->bindColumn('id',$user_id);
-            $stmt->bindColumn('username', $username);
-            $stmt->bindColumn('password', $db_password);
-            $stmt->bindColumn('salt', $salt);
-            $stmt->fetch();
+            $query->bindColumn('id',$this->userId);
+            $query->bindColumn('username', $this->userName);
+            $query->bindColumn('password', $db_password);
+            $query->bindColumn('salt', $salt);
+            $query->fetch();
 
             // hash the password with the unique salt.
             $password = hash('sha512', $password . $salt);
@@ -79,7 +86,7 @@ class Auth
                 // If the user exists we check if the account is locked
                 // from too many login attempts
 
-                if ($this->checkbrute($user_id) == true) {
+                if ($this->checkbrute($this->userId) == true) {
                     // Account is locked
                     // Send an email to user saying their account is locked
                     $this->is_login = false;
@@ -91,21 +98,19 @@ class Auth
                         // Get the user-agent string of the user.
                         $user_browser = $_SERVER['HTTP_USER_AGENT'];
                         // XSS protection as we might print this value
-                        $user_id = preg_replace("/[^0-9]+/", "", $user_id);
-                        $_SESSION['user_id'] = $user_id;
+                        $this->userId = preg_replace("/[^0-9]+/", "", $this->userId);
+                        $_SESSION['user_id'] = $this->userId;
                         // XSS protection as we might print this value
-                        $username = preg_replace("/[^a-zA-Z0-9_\-]+/", "", $username);
-                        $_SESSION['username'] = $username;
+                        $this->userName = preg_replace("/[^a-zA-Z0-9_\-]+/", "", $this->userName);
+                        $_SESSION['username'] = $this->userName;
                         $_SESSION['login_string'] = hash('sha512',$password.$user_browser);
                         // Login successful.
-                        $this->username = $username;
-                        $this->is_login = true;
                         $this->is_login = true;
                     } else {
                         // Password is not correct
                         // We record this attempt in the database
                         $now = time();
-                        $this->db->exec("INSERT INTO loginAttempts(user_id, time) VALUES ('$user_id', '$now')");
+                        $this->db->exec("INSERT INTO authLogins(userId, time) VALUES ('$this->userId', '$now')");
                         $this->is_login = false;
                     }
                 }
@@ -136,24 +141,24 @@ class Auth
         // Destroy session
         session_destroy();
 
-        $this->username = 'Guest';
+        $this->userName = 'Guest';
         $this->is_login = false;
     }
 
-    private function checkbrute($user_id) {
+    private function checkbrute() {
         // Get timestamp of current time
         $now = time();
 
         // All login attempts are counted from the past 2 hours.
         $valid_attempts = $now - (2 * 60 * 60);
 
-        if ($stmt = $this->db->prepare("SELECT COUNT(*) FROM loginAttempts WHERE user_id = ? AND time > ?")
+        if ($query = $this->db->prepare("SELECT COUNT(*) FROM authLogins WHERE userId = ? AND time > ?")
         ) {
             // Execute the prepared query.
-            $stmt->execute([$user_id, $valid_attempts]);
+            $query->execute([$this->userId, $valid_attempts]);
 
             // If there have been more than 5 failed logins
-            if ($stmt->fetch()[0] > 5) {
+            if ($query->fetch()[0] > 5) {
                 $this->is_login = true;
             } else {
                 $this->is_login = false;
@@ -164,50 +169,62 @@ class Auth
     }
 
     private function login_check() {
+        $db_password = '';
+        $this->is_login = false;
+
         // Check if all session variables are set
         if (isset($_SESSION['user_id'],
         $_SESSION['username'],
         $_SESSION['login_string'])) {
 
-            $user_id = $_SESSION['user_id'];
+            $this->userId = $_SESSION['user_id'];
             $login_string = $_SESSION['login_string'];
 
             // Get the user-agent string of the user.
             $user_browser = $_SERVER['HTTP_USER_AGENT'];
 
-            if ($stmt = $this->db->prepare("SELECT username, password FROM members WHERE id = ? LIMIT 1")) {
-                $stmt->execute([$user_id]);   // Execute the prepared query.
-                $stmt->bindColumn('username', $username);
-                $stmt->bindColumn('password', $db_password);
-                $stmt->fetch();
+            if ($query = $this->db->prepare("
+            SELECT t1.username AS userName, t1.password AS password, t1.groupId AS groupId, t2.name AS groupName
+              FROM authUsers t1
+              LEFT JOIN authGroups t2 ON t1.groupId = t2.id
+              WHERE t1.id = ?
+              ")
+            ) {
+                $query->execute([$this->userId]);
+                $query->bindColumn('userName', $this->userName);
+                $query->bindColumn('password', $db_password);
+                $query->bindColumn('groupId', $this->groupId);
+                $query->bindColumn('groupName', $this->groupName);
+                $query->fetch();
 
                 $password = trim($db_password);
-                if ($username == $_SESSION['username']) {
+                if ($this->userName == $_SESSION['username']) {
                     $login_check = hash('sha512', $password.$user_browser);
                     if ($login_check == $login_string) {
                         // Logged In!!!!
-                        $this->username = $username;
                         $this->is_login = true;
-                    } else {
-                        // Not logged in
-                        $this->is_login = false;
-                    }
-                } else {
-                    // Not logged in
-                    $this->is_login = false;
-                }
-            } else {
-                // Not logged in
-                $this->is_login = false;
-            }
-        } else {
-            // Not logged in
-            $this->is_login = false;
-        }
 
+                    }
+                }
+            }
+        }
         return $this->is_login;
     }
 
+    public function access_check($smapId){
+
+        if ($query = $this->db->prepare("
+          SELECT right
+          FROM authAccess
+          WHERE (userId = ? OR groupId = ?) AND smapId = ?
+              ")
+        ) {
+            $query->execute([$this->userId, $this->groupId, $smapId]);
+            $query->bindColumn('right', $this->right);
+            $query->fetch();
+        }
+        return $this->right;
+    }
     private function esc_url($url) {
 
         if ('' == $url) {

@@ -1,0 +1,12 @@
+.editable{
+    border: 1px solid red;
+}
+.mce-edit-focus{
+    border: 1px solid green;
+}
+.mce{
+    position: fixed;
+    top: 0px;
+    margin-left: -15px;
+    width: 100%;
+}
