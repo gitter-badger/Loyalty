@@ -72,7 +72,7 @@ define('COOKIE_RUNTIME', 1209600);
 define('COOKIE_DOMAIN', '.localhost');
 
 define("CAN_REGISTER", "any");
-define("DEFAULT_ROLE", "member");
+define("DEFAULT_GROUP", "member");
 
 define("SECURE", FALSE);    // FOR DEVELOPMENT ONLY!!!!
 

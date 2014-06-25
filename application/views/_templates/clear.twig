@@ -7,7 +7,7 @@
     <meta name="description" content="Loyality programs">
     <meta name="author" content="Supme">
 
-    <title>--------------</title>
+    <title>{{ constant('SITE_NAME') }} :: {{ page_title }}</title>
 
     <link rel="stylesheet" href="/public/bootstrap/3.1.1/css/bootstrap.min.css">
 
@@ -30,25 +30,15 @@
 
 <div class="container-fluid">
 
-    {% include view %}
+    {% include _view %}
 
 </div>
-
-{% if debug is defined  %}
-    <div class="alert alert-block">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {% for key,value in debug %}
-                <h4>{{ key }}</h4>
-                {{ value|e }}
-        {% endfor %}
-        </div>
-{% endif %}
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="/public/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>

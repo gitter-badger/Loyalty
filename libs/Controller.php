@@ -20,6 +20,7 @@ class Controller
     {
         // authorize and session
         $this->auth = new Auth($this->db);
+
     }
 
     /**
@@ -46,14 +47,12 @@ class Controller
         // @see http://twig.sensiolabs.org
         $twig_loader = new Twig_Loader_Filesystem(PATH_VIEWS);
         $twig = new Twig_Environment($twig_loader);
-        $page = Registry::get('pageArray');
-        $siteArray = Registry::get('siteArray');
-        $twig->addGlobal('_page', $page);
-        $twig->addGlobal('view', $page['view'] . PATH_VIEW_FILE_TYPE);
-        $twig->addGlobal('_siteMap', $siteArray);
+        $twig->addGlobal('_page', Registry::get('pageArray'));
+        $twig->addGlobal('_view', Registry::get('pageArray')['view'] . PATH_VIEW_FILE_TYPE);
+        $twig->addGlobal('_siteMap', Registry::get('siteArray'));
         $twig->addGlobal('_user', $this->auth);
 
         // render a view while passing the to-be-rendered data
-        echo $twig->render('_templates/' . $page['layout'] . PATH_VIEW_FILE_TYPE, $data_array);
+        echo $twig->render('_templates/' . Registry::get('pageArray')['layout'] . PATH_VIEW_FILE_TYPE, $data_array);
     }
 }

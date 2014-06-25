@@ -17,17 +17,38 @@
 class Login extends Controller {
     function index(){
 
+        $notification=[];
+
         // Login user
         if (isset($_POST["login"])) {
-            $this->auth->login($_POST['email'], $_POST['password']);
+            if($this->auth->login($_POST['email'], $_POST['password'])){
+                $notification = [
+                    'success' => [
+                        'You are login as '.$this->auth->userName,
+                    ]
+                ];
+            } else {
+                $notification = [
+                    'danger' => [
+                        'Error login',
+                    ]
+                ];
+            }
+
         }
 
         // Logout user
         if (isset($_POST["logout"])) {
             $this->auth->logout();
+            $notification = [
+                'info' => [
+                    'Success logout',
+                    'Thanks for using service',
+                ],
+            ];
         }
 
-        $this->render();
+        $this->render(['notifications' => $notification]);
     }
 
 }

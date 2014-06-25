@@ -1,0 +1,22 @@
+        <table class="table">
+            <tbody>
+            <tr style="background: #EEEEEE">
+                    <th><strong>User name</strong></th>
+                    <th><strong>Email</strong></th>
+                    <th><strong>Group name</strong></th>
+            </tr>
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            {{ user.userName }}
+                        </td>
+                        <td>
+                            {{ user.email }}
+                        </td>
+                        <td>
+                            {{ user.groupName  }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>

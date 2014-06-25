@@ -39,7 +39,6 @@ class Application
         $query->execute();
         $main = $query->fetch();
 
-
         // Create site map tree
         $this->_category_arr = $this->_getCategory();
         $this->_getTree(0, 0);
@@ -78,10 +77,16 @@ class Application
         if (file_exists(CONTROLLER_PATH .$page['controller'].'.php')){
             require CONTROLLER_PATH .$page['controller']. '.php';
             $controller = new $page['controller']();
+            if (method_exists($controller, 'init')) {
+                $controller->{'init'}($params);
+            }
             if (method_exists($controller, $page['action'])) {
                 $controller->{$page['action']}($params);
             } else {
                 $controller->index($params);
+            }
+            if (method_exists($controller, '__close')) {
+                $controller->{'_close'}($params);
             }
         } else {
             // redirect user to error page (there's a controller for that)

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Loyality Portal">
+    <meta name="description" content="Loyality programs">
     <meta name="author" content="Supme">
 
     <title>{{ constant('SITE_NAME') }} :: {{ page_title }}</title>
@@ -15,6 +15,7 @@
     <link href="/css/loyalty.css" rel="stylesheet">
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="/js/sha512.js"></script>
     {% if _user.isLogin %}
         <script src="/js/tinymce/tinymce.min.js"></script>
         <script src="/js/loyalty.js"></script>
@@ -75,7 +76,7 @@
             {% endfor %}
         {% endif %}
 
-        {% include view %}
+        {% include _view %}
 
         {% if debug is defined  %}
             <div class="alert alert-warning  alert-dismissable">
