@@ -46,12 +46,18 @@ class News extends Controller {
 
 
     }
-    function add(){
-
+    function edit($params){
 
         $news_model = $this->loadModel('News');
 
-        if (isset($_POST["submit_add_news"]) && $this->auth->is_login) {
+        if($params[0] =='')
+            if(!$this->auth->add) header('location: ' . URL . '403');
+        else
+            if(!$this->auth->edit) header('location: ' . URL . '403');
+
+
+
+        if (isset($_POST["submit_add_news"])) {
             $news_model->addNews($_POST["title"], $_POST["text"]);
         }
     }

@@ -33,11 +33,12 @@ class UsersModel extends Model
 
         $query = $this->db->prepare('SELECT userName, email FROM authUsers WHERE userName = ? OR email = ?');
         $query->execute([$userName, $email]);
-        $result = $query->fetchAll;
-        if(count($result) > 0){
+        var_dump($result = $query->fetchAll());
+        if(count($result) != 0){
             // User already exist
             return 'User already exist';
         } else {
+
             $salt = $this->saltGen();
             $password = hash('sha512', $password.$salt);
             $query = $this->db->prepare('INSERT INTO authUsers(groupId, userName, email, password, salt) VALUES (2, ?, ?, ?, ?)');

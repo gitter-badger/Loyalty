@@ -31,16 +31,34 @@ class Application
         } catch (PDOException $e) {
             die('Database connection could not be established.');
         }
-
         Registry::set('db', $this->db);
+
+        // authorize and session
+        $auth = new Auth($this->db);
+        Registry::set('auth', $auth);
 
         //Main page
         $query = $this->db->prepare('SELECT * FROM siteMap WHERE pid = 0');
         $query->execute();
         $main = $query->fetch();
 
+        $query = $this->db->prepare("
+          SELECT t1.id, t1.pid, t1.segment, t1.view, t1.layout, t1.controller, t1.action, t1.title, t1.visible
+          FROM siteMap t1
+          LEFT JOIN authAccess t2 ON t1.id = t2.smapId AND (t2.userId = ? OR t2.groupId = ?)
+          WHERE t2.smapId IS NULL OR (NOT t2.smapId IS NULL AND t2.right <> '0')
+              ");
+        $query->execute([$auth->userId, $auth->groupId]);
+        $siteMap = $query->fetchAll();
+
+        $tree = new Tree($siteMap);
+        $tree->each();
+        $siteTree = $tree->get();
+        Registry::set('siteTree', $siteTree);
+
         // Create site map tree
-        $this->_category_arr = $this->_getCategory();
+        $this->_category_arr = $this->_getCategory($siteMap);
+        //get root level menu
         $this->_getTree(0, 0);
 
         if (isset($_GET['url'])) {
@@ -52,6 +70,8 @@ class Application
         }
         $segments = explode('/', $url);
 
+
+// ToDo Использовать siteTree, а не siteMap
         $now = '';
         $run = false;
         $level = false;
@@ -71,7 +91,7 @@ class Application
         $page = $run?$this->siteArray[$level][$run]:$main;
 
         Registry::set('pageArray', $page);
-        Registry::set('siteArray', $this->siteArray);
+        //Registry::set('siteArray', $this->siteArray);
 
         // Run application
         if (file_exists(CONTROLLER_PATH .$page['controller'].'.php')){
@@ -94,13 +114,11 @@ class Application
         }
     }
 
-    private function _getCategory() {
-        $query = $this->db->prepare('SELECT * FROM siteMap');
-        $query->execute();
-        $result = $query->fetchAll();
+    private function _getCategory($siteMap) {
+
         //Перелапачиваем массим (делаем из одномерного массива - двумерный, в котором первый ключ - parent_id)
         $return = array();
-        foreach ($result as $value) {
+        foreach ($siteMap as $value) {
             $return[$value['pid']][] = $value;
         }
         return $return;

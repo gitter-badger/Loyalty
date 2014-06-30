@@ -1,29 +1,28 @@
 {% if count is defined %}
     {% for key, value in news %}
-        <blockquote>
-            <h2>
+            <h3>
                 {% if value.text is not null %}
                     <a href="{{ _page.segment }}/{{ value.id }}">{{ value.title }}</a>
                 {% else %}
                     {{ value.title }}
                 {% endif %}
-            </h2>
-            {{ value.announce|raw }}
-            <footer>
+            </h3>
+            <h6>
                 {{ value.date|date('d-m-Y H:i:s') }}
-            </footer>
-        </blockquote>
+            </h6>
+            {{ value.announce|raw }}
+            <hr/>
     {% endfor %}
 {% else %}
-    <h2>{{ news.title }}</h2>
-    <small>{{ news.date|date('d-m-Y H:i:s') }}</small>
+    <h3>{{ news.title }}</h3>
+    <h6>{{ news.date|date('d-m-Y H:i:s') }}</h6>
     <hr/>
     {{ news.text|raw }}
 {% endif %}
 
 
 
-{% if is_login %}
+{% if __user.add %}
 
     <script>
         tinymce.init({

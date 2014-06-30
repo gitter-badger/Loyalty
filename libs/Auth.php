@@ -23,18 +23,15 @@ class Auth
         $read,
         $add,
         $edit,
-        $delete;
-    private
-        $db,
+        $delete,
         $userId,
         $groupId;
+    private
+        $db;
+
 
     function __construct($db) {
-        try {
-            $this->db = Registry::get('db');
-        } catch (PDOException $e) {
-            exit('Database connection could not be established.');
-        }
+        $this->db = Registry::get('db');
 
         $this->sec_session_start();
 

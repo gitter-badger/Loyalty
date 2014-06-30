@@ -53,15 +53,15 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
+
+            {% import '_templates/menu.twig' as macros %}
             <ul class="nav nav-sidebar">
-                {% for kmap,map in _siteMap.1 %}
-                    {% if map.visible  %}
-                        <li{% if map.segment == _page.segment %} class="active"{% endif %}>
-                            <a href="{{ constant('URL') }}{{ kmap }}">{{ map.title }}</a>
-                        </li>
-                    {% endif %}
-                {%  endfor %}
+                <li{% if map.segment == _page.segment %} class="active"{% endif %}>
+                    <a href="{{ constant('URL') }}{{ _siteTree.0.segment }}">{{ _siteTree.0.title }}</a>
+                </li>
+                {{ macros.menu(_siteTree.0.childs) }}
             </ul>
+
         </div>
     </div>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

@@ -24,6 +24,12 @@ class Users extends Controller {
     }
 
     function add(){
-        $$this->users_model->addUser('Supme','supmea@gmail.com', '1234');
+        if(!$this->auth->add) header("Location: ../error/403");
+        $this->users_model->addUser('User','user@mail.com', 'pass');
+    }
+
+    function edit($params){
+        if(!$this->auth->edit) header("Location: ../error/403");
+        $this->users_model;
     }
 }
